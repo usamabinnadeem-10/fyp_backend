@@ -8,7 +8,7 @@ class Gallery(models.Model):
     features = ArrayField(
             models.FloatField(),
             size=2048)
-    timestamp = models.DateTimeField(auto_now_add=True)
-    lat = models.DecimalField(max_digits=9, decimal_places=6)
-    long = models.DecimalField(max_digits=9, decimal_places=6)
+#     timestamp = models.DateTimeField(auto_now_add=True, )
+#     lat = models.DecimalField(max_digits=9, decimal_places=6)
+#     long = models.DecimalField(max_digits=9, decimal_places=6)
 
