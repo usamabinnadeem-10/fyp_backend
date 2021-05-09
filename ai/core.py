@@ -6,7 +6,7 @@ import torchvision.transforms as transforms
 import numpy as np
 from PIL import Image
 
-from networks.resnet import resnet50, resnet101
+from .networks.resnet import resnet50, resnet101
 
 class Core:
 
@@ -47,18 +47,25 @@ class Core:
 
 
     # load gallery features from the database
-    def load_gallery_feats(self):
+    def load_gallery_feats(self, db_feats):
         self.gallery_feats = []
-        feats_filename = './temp/feats.txt'
 
-        with open(feats_filename, 'r') as f:
-            for line in f.readlines():
-                line = line[1:-2]
-                line = line.split(',')
-                arr = [float(x.strip()) for x in line]
-                t = torch.FloatTensor(arr)
-                t = t.reshape(1, 2048, 1, 1)
-                self.gallery_feats.append(t)
+        for arr in db_feats:
+            t = torch.FloatTensor(arr)
+            t = t.reshape(1, 2048, 1, 1)
+            self.gallery_feats.append(t)
+
+
+        # feats_filename = './temp/feats.txt'
+
+        # with open(feats_filename, 'r') as f:
+        #     for line in f.readlines():
+        #         line = line[1:-2]
+        #         line = line.split(',')
+        #         arr = [float(x.strip()) for x in line]
+        #         t = torch.FloatTensor(arr)
+        #         t = t.reshape(1, 2048, 1, 1)
+        #         self.gallery_feats.append(t)
 
         print('load gallery feats success!')
         
@@ -68,8 +75,8 @@ class Core:
         model = self.model
         model.eval()
         
-        img = Image.open(query).convert('RGB')
-        img = self.transform(img)
+        # img = Image.open(query).convert('RGB')
+        img = self.transform(query)
         img = img.unsqueeze(0)
         _, query_feats = model(img)
 
