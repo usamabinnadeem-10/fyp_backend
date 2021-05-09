@@ -2,28 +2,35 @@ import torch
 import torch.nn as nn
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
+import torchvision.transforms as transforms
+import numpy as np
+from PIL import Image
 
 from networks.resnet import resnet50, resnet101
 
 class Core:
+
+    # intialize model using trained parameters
     def __init__(self):
         self.num_classes = 576
-        self.weights = './weights/Car_epoch_90.pth'
+        self.weights = './temp/Car_epoch_90.pth'
 
         self.model = resnet50(num_classes=self.num_classes)
 
-        if weights != '':
+        if self.weights != '':
             try:
-                model = torch.nn.DataParallel(model)
-                ckpt = torch.load(weights, map_location=torch.device('cpu'))
-                model.load_state_dict(ckpt['state_dict'])
-                print ('!!!load weights success !!! path is ', weights)
+                self.model = torch.nn.DataParallel(self.model)
+                ckpt = torch.load(self.weights, map_location=torch.device('cpu'))
+                self.model.load_state_dict(ckpt['state_dict'])
+                print ('!!!load weights success !!! path is ', self.weights)
             except Exception as e:
                 print(e)
-                print ('!!!load weights failed !!! path is ', weights)
+                print ('!!!load weights failed !!! path is ', self.weights)
         else:
             print('!!!Load Weights PATH ERROR!!!')
 
+
+    # transform image for model input
     def transform(self, img):
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         scale_size = 336
@@ -38,7 +45,27 @@ class Core:
         
         return data_transform(img)
 
-    def backend_api(self, query, model, gallery_feats, TopK=20):
+
+    # load gallery features from the database
+    def load_gallery_feats(self):
+        self.gallery_feats = []
+        feats_filename = './temp/feats.txt'
+
+        with open(feats_filename, 'r') as f:
+            for line in f.readlines():
+                line = line[1:-2]
+                line = line.split(',')
+                arr = [float(x.strip()) for x in line]
+                t = torch.FloatTensor(arr)
+                t = t.reshape(1, 2048, 1, 1)
+                self.gallery_feats.append(t)
+
+        print('load gallery feats success!')
+        
+
+    # run function will take query image as argument and return indices of top K matches
+    def run(self, query, TopK=10):
+        model = self.model
         model.eval()
         
         img = Image.open(query).convert('RGB')
@@ -47,7 +74,7 @@ class Core:
         _, query_feats = model(img)
 
         qf = query_feats
-        gf = torch.cat(gallery_feats, dim=0)
+        gf = torch.cat(self.gallery_feats, dim=0)
 
         m, n = qf.shape[0], gf.shape[0]
         qf = qf.view(m, -1)
@@ -60,6 +87,3 @@ class Core:
         result = indices[:, :TopK]
 
         return result
-
-
-print('success')
