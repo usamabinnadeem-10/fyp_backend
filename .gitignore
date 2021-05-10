@@ -1,5 +1,7 @@
 *.pyc
 *.pyo
+*.pth
 
 .vscode/
-ai/temp/
+ai/weights/
+api/gallery_data

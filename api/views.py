@@ -13,12 +13,7 @@ class Query(APIView):
 
     def post(self, request):
 
-        feats = Gallery.objects.values_list('features')
-
-        print(type(feats))
-        print(type(feats[0]))
-        print(len(feats))
-        print(len(feats[0][0]))
+        feats = Gallery.objects.values_list('features',flat=True)
 
         core = Core()
         core.load_gallery_feats(feats)
@@ -26,19 +21,18 @@ class Query(APIView):
         format, imgstr = request.data['query'].split(';base64,')
         img_decoded = base64.b64decode(imgstr)
         stream = io.BytesIO(img_decoded)
-        img = Image.open(stream).convert("RGBA")
+        img = Image.open(stream).convert("RGB")
 
-        result = core.run(query=img)
-        
-    
-        # img.save('query.png','PNG')
+        results = core.run(query=img)
+        result_images = []
 
-        # img.show()
-
+        for result in results[0]:
+            instance = Gallery.objects.get(pk=result+1)
+            result_images.append(instance.name)
 
         return Response(
             {
-                'message' : 'This is Query View'
+                'result' : result_images
             },
             status=status.HTTP_200_OK
         )

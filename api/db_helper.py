@@ -2,11 +2,11 @@ import psycopg2
 import os
 import sys
 
-with open( (os.path.join(sys.path[0], 'veri_test_list.txt') ), "r" ) as f:
+with open( (os.path.join(sys.path[0], 'names.txt') ), "r" ) as f:
     content = f.readlines()
 names = [x.strip() for x in content] 
 
-with open( (os.path.join(sys.path[0], 'feats_sample.txt') ), "r" ) as f:
+with open( (os.path.join(sys.path[0], 'feats.txt') ), "r" ) as f:
     content = f.readlines()
 feats = [x.strip() for x in content] 
 

@@ -13,7 +13,7 @@ class Core:
     # intialize model using trained parameters
     def __init__(self):
         self.num_classes = 576
-        self.weights = './temp/Car_epoch_90.pth'
+        self.weights = 'ai\weights\Car_epoch_90.pth'
 
         self.model = resnet50(num_classes=self.num_classes)
 
@@ -55,18 +55,6 @@ class Core:
             t = t.reshape(1, 2048, 1, 1)
             self.gallery_feats.append(t)
 
-
-        # feats_filename = './temp/feats.txt'
-
-        # with open(feats_filename, 'r') as f:
-        #     for line in f.readlines():
-        #         line = line[1:-2]
-        #         line = line.split(',')
-        #         arr = [float(x.strip()) for x in line]
-        #         t = torch.FloatTensor(arr)
-        #         t = t.reshape(1, 2048, 1, 1)
-        #         self.gallery_feats.append(t)
-
         print('load gallery feats success!')
         
 
@@ -75,7 +63,6 @@ class Core:
         model = self.model
         model.eval()
         
-        # img = Image.open(query).convert('RGB')
         img = self.transform(query)
         img = img.unsqueeze(0)
         _, query_feats = model(img)
