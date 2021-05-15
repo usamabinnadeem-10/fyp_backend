@@ -1,7 +1,9 @@
 *.pyc
 *.pyo
 *.pth
+*.jpg
 
 .vscode/
+ai/image_test
 ai/weights/
 api/gallery_data

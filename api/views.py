@@ -24,15 +24,23 @@ class Query(APIView):
         img = Image.open(stream).convert("RGB")
 
         results = core.run(query=img)
-        result_images = []
+
+        result_images_names = []
 
         for result in results[0]:
             instance = Gallery.objects.get(pk=result+1)
-            result_images.append(instance.name)
+            result_images_names.append(instance.name)
+
+        result_images = []
+        for name in result_images_names:
+            path = "ai/image_test/" + name
+            with open(path, "rb") as image_file:
+                result_images.append(base64.b64encode(image_file.read()))
 
         return Response(
             {
-                'result' : result_images
+                'names' : result_images_names,
+                'images'   : result_images
             },
             status=status.HTTP_200_OK
         )
